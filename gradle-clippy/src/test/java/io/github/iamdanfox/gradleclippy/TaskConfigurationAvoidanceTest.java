@@ -160,4 +160,20 @@ public class TaskConfigurationAvoidanceTest {
                         "}")
                 .doTest();
     }
+
+    @Test
+    public void withType_getByName() {
+        compilationHelper
+                .addSourceLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    // BUG: Diagnostic contains: Use .named(java.lang.String)",
+                        "    project.getTasks().withType(org.gradle.api.DefaultTask.class).getByName(\"foo\");",
+                        "  }",
+                        "}")
+                .doTest();
+    }
 }

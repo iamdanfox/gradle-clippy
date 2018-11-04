@@ -38,10 +38,10 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
                     .onDescendantOf("org.gradle.api.tasks.TaskCollection")
                     .named("getByName");
 
-    private static final MethodMatchers.ParameterMatcher GET_BY_PATH =
+    private static final MethodMatchers.ParameterMatcher CROSS_PROJECT_LOOKUP =
             MethodMatchers.instanceMethod()
                     .onExactClass("org.gradle.api.tasks.TaskContainer")
-                    .named("getByPath")
+                    .namedAnyOf("getByPath", "findByPath")
                     .withParameters("java.lang.String");
 
     @Override
@@ -90,7 +90,7 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
                     .build();
         }
 
-        if (GET_BY_PATH.matches(tree, state)) {
+        if (CROSS_PROJECT_LOOKUP.matches(tree, state)) {
             return buildDescription(tree)
                     .setMessage("Accessing tasks from another project requires a "
                             + "specific ordering of project evaluation.")
