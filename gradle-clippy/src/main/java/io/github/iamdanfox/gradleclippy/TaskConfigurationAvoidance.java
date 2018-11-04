@@ -25,11 +25,11 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
         // https://docs.gradle.org/current/userguide/task_configuration_avoidance.html
-        MethodMatchers.MethodNameMatcher matcher = MethodMatchers.instanceMethod()
+        MethodMatchers.MethodNameMatcher createMatcher = MethodMatchers.instanceMethod()
                 .onExactClass("org.gradle.api.tasks.TaskContainer")
                 .named("create");
 
-        if (matcher.matches(tree, state)) {
+        if (createMatcher.withParameters("java.lang.String").matches(tree, state)) {
             return buildDescription(tree)
                     .setMessage("TODO")
                     .build();

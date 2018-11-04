@@ -18,14 +18,28 @@ public class TaskConfigurationAvoidanceTest {
     }
 
     @Test
-    public void smoke_test() {
-        compilationHelper.addSourceLines("Project1.java",
+    public void create_with_string() {
+        compilationHelper.addSourceLines("MyProject.java",
                 "import org.gradle.api.Plugin;",
                 "import org.gradle.api.Project;",
-                "public class Project1 implements Plugin<Project> {",
+                "public class MyProject implements Plugin<Project> {",
                 "  public void apply(Project project) {",
                 "    // BUG: Diagnostic contains: TaskConfigurationAvoidance",
                 "    project.getTasks().create(\"myTask\");",
+                "  }",
+                "}")
+                .doTest();
+    }
+
+    @Test
+    public void create_with_string_and_closure() {
+        compilationHelper.addSourceLines("MyProject.java",
+                "import org.gradle.api.Plugin;",
+                "import org.gradle.api.Project;",
+                "public class MyProject implements Plugin<Project> {",
+                "  public void apply(Project project) {",
+                "    groovy.lang.Closure closure = null;",
+                "    project.getTasks().create(\"myTask\", closure);",
                 "  }",
                 "}")
                 .doTest();
