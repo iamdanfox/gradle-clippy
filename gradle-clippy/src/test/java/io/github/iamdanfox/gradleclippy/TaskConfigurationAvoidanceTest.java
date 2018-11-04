@@ -103,4 +103,28 @@ public class TaskConfigurationAvoidanceTest {
                         "}")
                 .doTest();
     }
+
+    @Test
+    public void getByName_with_string() {
+        fixHelper
+                .addInputLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    project.getTasks().getByName(\"task\");",
+                        "  }",
+                        "}")
+                .addOutputLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    project.getTasks().named(\"task\");",
+                        "  }",
+                        "}")
+                .doTest();
+    }
 }

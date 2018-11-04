@@ -33,6 +33,10 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
                     .onExactClass("org.gradle.api.tasks.TaskContainer")
                     .named("create");
 
+    private static final MethodMatchers.MethodNameMatcher GET_BY_NAME =
+            MethodMatchers.instanceMethod()
+                    .onExactClass("org.gradle.api.tasks.TaskContainer")
+                    .named("getByName");
 
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -47,37 +51,42 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
         }
 
         if (CREATE_MATCHER.withParameters("java.lang.String").matches(tree, state)) {
-            return buildDescription(tree)
-                    .setMessage("Use .register(java.lang.String) to avoid eagerly configuring this task")
-                    .addFix(SuggestedFix.replace(
-                            state.getEndPosition(ASTHelpers.getReceiver(tree)),
-                            state.getEndPosition(tree.getMethodSelect()),
-                            ".register"))
-                    .build();
+            return replaceWithRegister(tree, state, "java.lang.String");
         }
 
         if (CREATE_MATCHER.withParameters("java.lang.String", "java.lang.Class").matches(tree, state)) {
-            return buildDescription(tree)
-                    .setMessage("Use .register(java.lang.String, java.lang.Class) "
-                            + "to avoid eagerly configuring this task")
-                    .addFix(SuggestedFix.replace(
-                            state.getEndPosition(ASTHelpers.getReceiver(tree)),
-                            state.getEndPosition(tree.getMethodSelect()),
-                            ".register"))
-                    .build();
+            return replaceWithRegister(tree, state, "java.lang.String, java.lang.Class");
+        }
+
+        if (CREATE_MATCHER.withParameters("java.lang.String", "java.lang.Class", "org.gradle.api.Action")
+                .matches(tree, state)) {
+            return replaceWithRegister(tree, state, "java.lang.String, java.lang.Class, org.gradle.api.Action");
         }
 
         if (CREATE_MATCHER.withParameters("java.lang.String", "groovy.lang.Closure").matches(tree, state)) {
+            return replaceWithRegister(tree, state, "java.lang.String, org.gradle.api.Action");
+        }
+
+        if (GET_BY_NAME.withParameters("java.lang.String").matches(tree, state)) {
             return buildDescription(tree)
-                    .setMessage("Use .register(java.lang.String, org.gradle.api.Action) "
-                            + "to avoid eagerly configuring this task")
+                    .setMessage("Use .named(java.lang.String) to avoid eagerly configuring this task")
                     .addFix(SuggestedFix.replace(
                             state.getEndPosition(ASTHelpers.getReceiver(tree)),
                             state.getEndPosition(tree.getMethodSelect()),
-                            ".register"))
+                            ".named"))
                     .build();
         }
 
         return Description.NO_MATCH;
+    }
+
+    private Description replaceWithRegister(MethodInvocationTree tree, VisitorState state, String s) {
+        return buildDescription(tree)
+                .setMessage("Use .register(" + s + ") to avoid eagerly configuring this task")
+                .addFix(SuggestedFix.replace(
+                        state.getEndPosition(ASTHelpers.getReceiver(tree)),
+                        state.getEndPosition(tree.getMethodSelect()),
+                        ".register"))
+                .build();
     }
 }
