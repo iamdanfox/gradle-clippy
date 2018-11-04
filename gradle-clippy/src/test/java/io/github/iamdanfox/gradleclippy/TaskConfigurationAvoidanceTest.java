@@ -127,4 +127,21 @@ public class TaskConfigurationAvoidanceTest {
                         "}")
                 .doTest();
     }
+
+    @Test
+    public void getByName_with_string_and_closure() {
+        compilationHelper
+                .addSourceLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    groovy.lang.Closure closure = null;",
+                        "// BUG: Diagnostic contains: Use .named(java.lang.String).configure(org.gradle.api.Action)",
+                        "    project.getTasks().getByName(\"task\", closure);",
+                        "  }",
+                        "}")
+                .doTest();
+    }
 }

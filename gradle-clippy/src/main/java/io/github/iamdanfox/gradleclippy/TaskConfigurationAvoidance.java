@@ -35,7 +35,7 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
 
     private static final MethodMatchers.MethodNameMatcher GET_BY_NAME =
             MethodMatchers.instanceMethod()
-                    .onExactClass("org.gradle.api.tasks.TaskContainer")
+                    .onDescendantOf("org.gradle.api.tasks.TaskCollection")
                     .named("getByName");
 
     @Override
@@ -74,6 +74,13 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
                             state.getEndPosition(ASTHelpers.getReceiver(tree)),
                             state.getEndPosition(tree.getMethodSelect()),
                             ".named"))
+                    .build();
+        }
+
+        if (GET_BY_NAME.withParameters("java.lang.String", "groovy.lang.Closure").matches(tree, state)) {
+            return buildDescription(tree)
+                    .setMessage("Use .named(java.lang.String).configure(org.gradle.api.Action) "
+                            + "to avoid eagerly configuring this task")
                     .build();
         }
 
