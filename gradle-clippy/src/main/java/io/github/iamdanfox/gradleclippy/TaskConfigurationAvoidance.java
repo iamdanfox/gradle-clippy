@@ -38,6 +38,12 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
                     .onDescendantOf("org.gradle.api.tasks.TaskCollection")
                     .named("getByName");
 
+    private static final MethodMatchers.ParameterMatcher GET_BY_PATH =
+            MethodMatchers.instanceMethod()
+                    .onExactClass("org.gradle.api.tasks.TaskContainer")
+                    .named("getByPath")
+                    .withParameters("java.lang.String");
+
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
         Matcher<ExpressionTree> deprecatedCreateUsage =
@@ -81,6 +87,13 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
             return buildDescription(tree)
                     .setMessage("Use .named(java.lang.String).configure(org.gradle.api.Action) "
                             + "to avoid eagerly configuring this task")
+                    .build();
+        }
+
+        if (GET_BY_PATH.matches(tree, state)) {
+            return buildDescription(tree)
+                    .setMessage("Accessing tasks from another project requires a "
+                            + "specific ordering of project evaluation.")
                     .build();
         }
 

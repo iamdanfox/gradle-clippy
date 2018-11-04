@@ -144,4 +144,20 @@ public class TaskConfigurationAvoidanceTest {
                         "}")
                 .doTest();
     }
+
+    @Test
+    public void getByPath_with_string() {
+        compilationHelper
+                .addSourceLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    // BUG: Diagnostic contains: Accessing tasks from another project",
+                        "    project.getTasks().getByPath(\":other:task\");",
+                        "  }",
+                        "}")
+                .doTest();
+    }
 }
