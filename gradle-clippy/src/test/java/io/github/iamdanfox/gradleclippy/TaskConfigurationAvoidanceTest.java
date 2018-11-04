@@ -10,7 +10,6 @@ import org.junit.Test;
 
 // This doesn't seem to work from IntelliJ, run ./gradlew test --tests "*TaskConfigurationAvoidanceTest"
 public class TaskConfigurationAvoidanceTest {
-
     private CompilationTestHelper compilationHelper;
 
     @Before
@@ -20,10 +19,15 @@ public class TaskConfigurationAvoidanceTest {
 
     @Test
     public void smoke_test() {
-        compilationHelper.addSourceLines(
-                "Bean.java",
-                "class Bean {",
-                "Exception foo = new IllegalArgumentException(\"Foo\");",
-                "}").doTest();
+        compilationHelper.addSourceLines("Project1.java",
+                "import org.gradle.api.Plugin;",
+                "import org.gradle.api.Project;",
+                "public class Project1 implements Plugin<Project> {",
+                "  public void apply(Project project) {",
+                "    // BUG: Diagnostic contains: TaskConfigurationAvoidance",
+                "    project.getTasks().create(\"myTask\");",
+                "  }",
+                "}")
+                .doTest();
     }
 }
