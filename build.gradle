@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            url 'https://dl.bintray.com/palantir/releases/'
+        }
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+
+    dependencies {
+        // classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        // classpath 'com.netflix.nebula:nebula-publishing-plugin:9.0.2'
+        classpath 'com.palantir.baseline:gradle-baseline-java:0.38.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.11.0'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:2.0.0'
+    }
+}
+
+apply plugin: 'com.palantir.baseline'
+apply plugin: 'com.palantir.git-version'
+
+allprojects {
+    version gitVersion()
+    group 'io.github.iamdanfox.gradleclippy'
+
+    repositories {
+        jcenter()
+        maven {
+            url 'https://dl.bintray.com/palantir/releases/'
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'org.inferred.processors'
+
+    sourceCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+        options.compilerArgs += ['-Werror']
+    }
+}

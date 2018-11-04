@@ -1,0 +1,5 @@
+rootProject.name = 'gradle-clippy'
+
+include 'gradle-clippy'
+
+enableFeaturePreview('STABLE_PUBLISHING')
