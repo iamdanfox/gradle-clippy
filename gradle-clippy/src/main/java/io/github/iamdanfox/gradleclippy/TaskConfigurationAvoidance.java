@@ -71,7 +71,10 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
             return buildDescription(tree)
                     .setMessage("Use .register(java.lang.String, org.gradle.api.Action) "
                             + "to avoid eagerly configuring this task")
-                    // no fix because changing Closure -> Action won't compile
+                    .addFix(SuggestedFix.replace(
+                            state.getEndPosition(ASTHelpers.getReceiver(tree)),
+                            state.getEndPosition(tree.getMethodSelect()),
+                            ".register"))
                     .build();
         }
 
