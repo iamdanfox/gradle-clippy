@@ -47,7 +47,6 @@ public class TaskConfigurationAvoidanceTest {
                         "public class MyProject implements Plugin<Project> {",
                         "  public void apply(Project project) {",
                         "    String name = \"myTask\";",
-                        "    // BUG: Diagnostic contains: .register(java.lang.String)",
                         "    project.getTasks().create(name);",
                         "  }",
                         "}")
@@ -58,8 +57,31 @@ public class TaskConfigurationAvoidanceTest {
                         "public class MyProject implements Plugin<Project> {",
                         "  public void apply(Project project) {",
                         "    String name = \"myTask\";",
-                        "    // BUG: Diagnostic contains: .register(java.lang.String)",
                         "    project.getTasks().register(name);",
+                        "  }",
+                        "}")
+                .doTest();
+    }
+
+    @Test
+    public void create_with_string_and_class() {
+        fixHelper
+                .addInputLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    project.getTasks().create(\"name\", org.gradle.api.DefaultTask.class);",
+                        "  }",
+                        "}")
+                .addOutputLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    project.getTasks().register(\"name\", org.gradle.api.DefaultTask.class);",
                         "  }",
                         "}")
                 .doTest();

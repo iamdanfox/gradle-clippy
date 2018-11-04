@@ -10,8 +10,11 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.matchers.method.MethodMatchers;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 
 @AutoService(BugChecker.class)
@@ -30,9 +33,14 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
                     .onExactClass("org.gradle.api.tasks.TaskContainer")
                     .named("create");
 
+
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-        if (CREATE_MATCHER.withParameters("java.util.Map").matches(tree, state)) {
+        Matcher<ExpressionTree> deprecatedCreateUsage =
+                Matchers.anyOf(
+                        CREATE_MATCHER.withParameters("java.util.Map"),
+                        CREATE_MATCHER.withParameters("java.util.Map", "groovy.lang.Closure"));
+        if (deprecatedCreateUsage.matches(tree, state)) {
             return buildDescription(tree)
                     .setMessage("Use .register(...) to avoid eagerly configuring this task")
                     .build();
@@ -41,6 +49,17 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
         if (CREATE_MATCHER.withParameters("java.lang.String").matches(tree, state)) {
             return buildDescription(tree)
                     .setMessage("Use .register(java.lang.String) to avoid eagerly configuring this task")
+                    .addFix(SuggestedFix.replace(
+                            state.getEndPosition(ASTHelpers.getReceiver(tree)),
+                            state.getEndPosition(tree.getMethodSelect()),
+                            ".register"))
+                    .build();
+        }
+
+        if (CREATE_MATCHER.withParameters("java.lang.String", "java.lang.Class").matches(tree, state)) {
+            return buildDescription(tree)
+                    .setMessage("Use .register(java.lang.String, java.lang.Class) "
+                            + "to avoid eagerly configuring this task")
                     .addFix(SuggestedFix.replace(
                             state.getEndPosition(ASTHelpers.getReceiver(tree)),
                             state.getEndPosition(tree.getMethodSelect()),
