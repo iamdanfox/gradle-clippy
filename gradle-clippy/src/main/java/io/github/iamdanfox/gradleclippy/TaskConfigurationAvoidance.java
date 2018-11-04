@@ -20,11 +20,11 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
         name = "TaskConfigurationAvoidance",
-        link = "https://github.com/iamdanfox/gradle-clippy",
+        link = "https://github.com/iamdanfox/gradle-clippy#TaskConfigurationAvoidance",
         linkType = BugPattern.LinkType.CUSTOM,
         category = BugPattern.Category.ONE_OFF,
-        severity = BugPattern.SeverityLevel.SUGGESTION,
-        summary = "Avoid unnecessarily configurating tasks")
+        severity = BugPattern.SeverityLevel.WARNING,
+        summary = "Avoid configuring tasks unless absolutely necessary")
 public final class TaskConfigurationAvoidance extends BugChecker implements BugChecker.MethodInvocationTreeMatcher {
 
     // https://docs.gradle.org/current/userguide/task_configuration_avoidance.html
@@ -100,9 +100,9 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
         return Description.NO_MATCH;
     }
 
-    private Description replaceWithRegister(MethodInvocationTree tree, VisitorState state, String s) {
+    private Description replaceWithRegister(MethodInvocationTree tree, VisitorState state, String signature) {
         return buildDescription(tree)
-                .setMessage("Use .register(" + s + ") to avoid eagerly configuring this task")
+                .setMessage("Use .register(" + signature + ") to avoid eagerly configuring this task")
                 .addFix(SuggestedFix.replace(
                         state.getEndPosition(ASTHelpers.getReceiver(tree)),
                         state.getEndPosition(tree.getMethodSelect()),
