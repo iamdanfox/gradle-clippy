@@ -1,6 +1,9 @@
 dependencies {
     api 'com.google.errorprone:error_prone_core'
 
+    annotationProcessor 'com.google.auto.service:auto-service'
+    compileOnly 'com.google.auto.service:auto-service'
+
     testImplementation 'com.google.errorprone:error_prone_test_helpers'
     testImplementation 'junit:junit'
     testImplementation 'org.assertj:assertj-core'

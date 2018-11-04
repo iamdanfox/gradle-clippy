@@ -1,13 +1,14 @@
 com.google.errorprone:error_prone_annotations = 2.3.2
 com.google.errorprone:error_prone_core = 2.3.2
 com.google.errorprone:error_prone_test_helpers = 2.3.2
+com.google.auto:auto-common = 0.10
+com.google.auto.service:auto-service = 1.0-rc4
 
 # test
 junit:junit = 4.12
 org.assertj:assertj-core = 3.11.1
 
 # conflict resolution
-com.google.auto:auto-common = 0.10
 com.google.code.findbugs:jsr305 = 3.0.0
 com.google.guava:guava = 23.5-jre
 com.google.truth:truth = 0.37
