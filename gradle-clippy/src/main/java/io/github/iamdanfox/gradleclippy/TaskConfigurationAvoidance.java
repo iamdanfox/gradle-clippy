@@ -32,6 +32,12 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
 
     @Override
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+        if (CREATE_MATCHER.withParameters("java.util.Map").matches(tree, state)) {
+            return buildDescription(tree)
+                    .setMessage("Use .register(...) to avoid eagerly configuring this task")
+                    .build();
+        }
+
         if (CREATE_MATCHER.withParameters("java.lang.String").matches(tree, state)) {
             return buildDescription(tree)
                     .setMessage("Use .register(java.lang.String) to avoid eagerly configuring this task")

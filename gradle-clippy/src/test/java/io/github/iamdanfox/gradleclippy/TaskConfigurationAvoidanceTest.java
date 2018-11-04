@@ -21,6 +21,23 @@ public class TaskConfigurationAvoidanceTest {
     }
 
     @Test
+    public void create_with_map() {
+        compilationHelper
+                .addSourceLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    java.util.Map<String, Object> map = java.util.Collections.emptyMap();",
+                        "    // BUG: Diagnostic contains: Use .register(...) to avoid eagerly configuring this task",
+                        "    project.getTasks().create(map);",
+                        "  }",
+                        "}")
+                .doTest();
+    }
+
+    @Test
     public void create_with_string() {
         fixHelper
                 .addInputLines(
