@@ -50,16 +50,29 @@ public class TaskConfigurationAvoidanceTest {
 
     @Test
     public void create_with_string_and_closure() {
-        compilationHelper.addSourceLines("MyProject.java",
-                "import org.gradle.api.Plugin;",
-                "import org.gradle.api.Project;",
-                "public class MyProject implements Plugin<Project> {",
-                "  public void apply(Project project) {",
-                "    groovy.lang.Closure closure = null;",
-                "    // BUG: Diagnostic contains: .register(java.lang.String, org.gradle.api.Action)",
-                "    project.getTasks().create(\"myTask\", closure);",
-                "  }",
-                "}")
+        fixHelper
+                .addInputLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    groovy.lang.Closure closure = null;",
+                        "    // BUG: Diagnostic contains: .register(java.lang.String, org.gradle.api.Action)",
+                        "    project.getTasks().create(\"myTask\", closure);",
+                        "  }",
+                        "}")
+                .addOutputLines(
+                        "MyProject.java",
+                        "import org.gradle.api.Plugin;",
+                        "import org.gradle.api.Project;",
+                        "public class MyProject implements Plugin<Project> {",
+                        "  public void apply(Project project) {",
+                        "    groovy.lang.Closure closure = null;",
+                        "    // BUG: Diagnostic contains: .register(java.lang.String, org.gradle.api.Action)",
+                        "    project.getTasks().register(\"myTask\", closure);",
+                        "  }",
+                        "}")
                 .doTest();
     }
 }
