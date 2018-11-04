@@ -31,7 +31,14 @@ public final class TaskConfigurationAvoidance extends BugChecker implements BugC
 
         if (createMatcher.withParameters("java.lang.String").matches(tree, state)) {
             return buildDescription(tree)
-                    .setMessage("TODO")
+                    .setMessage("Use .register(java.lang.String) to avoid eagerly configuring this task")
+                    .build();
+        }
+
+        if (createMatcher.withParameters("java.lang.String", "groovy.lang.Closure").matches(tree, state)) {
+            return buildDescription(tree)
+                    .setMessage("Use .register(java.lang.String, org.gradle.api.Action) "
+                            + "to avoid eagerly configuring this task")
                     .build();
         }
 

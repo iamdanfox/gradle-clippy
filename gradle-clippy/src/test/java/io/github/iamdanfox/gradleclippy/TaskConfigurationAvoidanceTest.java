@@ -24,7 +24,7 @@ public class TaskConfigurationAvoidanceTest {
                 "import org.gradle.api.Project;",
                 "public class MyProject implements Plugin<Project> {",
                 "  public void apply(Project project) {",
-                "    // BUG: Diagnostic contains: TaskConfigurationAvoidance",
+                "    // BUG: Diagnostic contains: .register(java.lang.String)",
                 "    project.getTasks().create(\"myTask\");",
                 "  }",
                 "}")
@@ -39,6 +39,7 @@ public class TaskConfigurationAvoidanceTest {
                 "public class MyProject implements Plugin<Project> {",
                 "  public void apply(Project project) {",
                 "    groovy.lang.Closure closure = null;",
+                "    // BUG: Diagnostic contains: .register(java.lang.String, org.gradle.api.Action)",
                 "    project.getTasks().create(\"myTask\", closure);",
                 "  }",
                 "}")
